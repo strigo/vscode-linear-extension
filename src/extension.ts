@@ -15,11 +15,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   if (!hasApiKey) {
     vscode.window.showInformationMessage(
-      'Please run "Connect to Linear" to initialize the connection.'
-    );
-  } else {
-    vscode.window.showInformationMessage(
-      "Your Linear client connection is all set!"
+      'Please run "Connect to Linear" to initialize the connection'
     );
   }
 
@@ -45,24 +41,39 @@ export async function activate(context: vscode.ExtensionContext) {
 
   const getMyIssuesDisposable = vscode.commands.registerCommand(
     "linear.getMyIssues",
-    async () => {
-      const issues = await getMyIssues();
-      const selectedIssue = await vscode.window.showQuickPick(
-        issues?.map((issue) => ({
-          label: issue.identifier,
-          description: issue.title,
-          target: issue.id,
-        })) || [],
+    () => {
+      vscode.window.withProgress(
         {
-          placeHolder: "Select an issue to save to the working context",
+          location: vscode.ProgressLocation.Notification,
+          cancellable: false,
+        },
+        async (progress, token) => {
+          token.onCancellationRequested(() => {
+            console.log("User canceled the long running operation");
+          });
+
+          progress.report({ increment: 0, message: "Fetching issues..." });
+          const issues = await getMyIssues();
+          progress.report({ increment: 100 });
+
+          const selectedIssue = await vscode.window.showQuickPick(
+            issues?.map((issue) => ({
+              label: `${issue.identifier} ${issue.title}`,
+              description: issue.identifier,
+              target: issue.id,
+            })) || [],
+            {
+              placeHolder: "Select an issue to save to the working context",
+            }
+          );
+          if (selectedIssue) {
+            setContextIssueId(selectedIssue.target);
+            vscode.window.showInformationMessage(
+              `Linear context issue is set to ${selectedIssue.description}`
+            );
+          }
         }
       );
-      if (selectedIssue) {
-        setContextIssueId(selectedIssue.target);
-        vscode.window.showInformationMessage(
-          `Linear context issue is set to ${selectedIssue.label}.`
-        );
-      }
     }
   );
   context.subscriptions.push(getMyIssuesDisposable);
@@ -74,12 +85,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
       if (comment) {
         if (await addContextIssueComment(comment)) {
-          vscode.window.showInformationMessage("Context issue comment added!");
+          vscode.window.showInformationMessage("Context issue comment added");
         } else {
-          vscode.window.showErrorMessage("Error commenting the context issue.");
+          vscode.window.showErrorMessage("Error commenting the context issue");
         }
       } else {
-        vscode.window.showErrorMessage("Comment cannot be empty.");
+        vscode.window.showErrorMessage("Comment cannot be empty");
       }
     }
   );
