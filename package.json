@@ -4,7 +4,7 @@
   "description": "Manage your Linear projects from VS Code",
   "version": "0.0.1",
   "engines": {
-    "vscode": "1.60.0"
+    "vscode": "^1.60.0"
   },
   "categories": [
     "Other"
@@ -12,7 +12,8 @@
   "activationEvents": [
     "onCommand:linear.connect",
     "onCommand:linear.getMyIssues",
-    "onCommand:linear.addContextIssueComment"
+    "onCommand:linear.addContextIssueComment",
+    "onCommand:linear.setContextIssue"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -28,6 +29,10 @@
       {
         "command": "linear.addContextIssueComment",
         "title": "Linear: Comment context issue"
+      },
+      {
+        "command": "linear.setContextIssue",
+        "title": "Linear: Set context issue"
       }
     ]
   },
@@ -53,6 +58,6 @@
     "vscode-test": "1.5.2"
   },
   "dependencies": {
-    "@linear/sdk": "^1.19.0"
+    "@linear/sdk": "1.19.0"
   }
 }
