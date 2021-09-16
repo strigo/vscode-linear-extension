@@ -108,8 +108,6 @@ export async function activate(context: vscode.ExtensionContext) {
         await vscode.window.showInputBox({ placeHolder: "Issue identifier" })
       )?.toString();
 
-      console.log(issueIdentifier);
-
       if (!issueIdentifier) {
         return;
       }
