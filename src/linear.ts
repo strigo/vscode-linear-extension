@@ -1,5 +1,5 @@
 import { ExtensionContext, SecretStorage, Memento } from "vscode";
-import { Issue, LinearClient } from "@linear/sdk";
+import { Issue, LinearClient, WorkflowState } from "@linear/sdk";
 
 let _secretStorage: SecretStorage;
 let _storage: Memento;
@@ -99,6 +99,49 @@ export const addContextIssueComment = async (
     }
   } catch (err) {
     console.error("Error commenting context issue", err);
+    return false;
+  }
+  return true;
+};
+
+export const getWorkflowStates = async (): Promise<WorkflowState[] | null> => {
+  if (_client) {
+    try {
+      const workflowStates = await _client.workflowStates();
+
+      return workflowStates.nodes;
+    } catch (err) {
+      console.error("Error getting workflow states", err);
+    }
+  } else {
+    console.error("No initialized Linear client found");
+  }
+  return null;
+};
+
+export const setContextIssueStatus = async (
+  status: string
+): Promise<boolean> => {
+  if (!_client) {
+    return false;
+  }
+  if (!status) {
+    return false;
+  }
+  try {
+    const issueId = (await _storage.get("linearContextIssueId")) as string;
+    if (!issueId) {
+      return false;
+    }
+    const statusPayload = await _client.issueUpdate(
+      issueId,
+      { stateId: status },
+    );
+    if (!statusPayload.success) {
+      return false;
+    }
+  } catch (err) {
+    console.error("Error setting context issue status", err);
     return false;
   }
   return true;

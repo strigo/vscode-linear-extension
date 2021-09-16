@@ -7,6 +7,8 @@ import {
   setContextIssueId,
   addContextIssueComment,
   getIssueByIdentifier,
+  getWorkflowStates,
+  setContextIssueStatus
 } from "./linear";
 
 // This method is called when the extension is activated.
@@ -144,13 +146,42 @@ export async function activate(context: vscode.ExtensionContext) {
   );
   context.subscriptions.push(setContextIssueDisposable);
 
+  const setContextIssueStatusDisposable = vscode.commands.registerCommand(
+    "linear.setContextIssueStatus",
+    async () => {
+
+      vscode.window.showInformationMessage("Getting available statuses...");
+      const statuses = await getWorkflowStates();
+
+      console.error({ statuses });
+
+      const selectedStatus = await vscode.window.showQuickPick(
+        statuses?.map((status) => ({
+          label: status.name,
+          // description: issue.identifier,
+          target: status.id,
+        })) || [],
+        {
+          placeHolder: "Select a status to set for the issue",
+        }
+      );
+      if (selectedStatus) {
+        setContextIssueStatus(selectedStatus.target);
+        vscode.window.showInformationMessage(
+          `Linear context issue status is set to ${selectedStatus.label}`
+        );
+      }
+    }
+  );
+  context.subscriptions.push(setContextIssueStatusDisposable);
+
   // Roadmap:
   // V linear.connect
   // V linear.getMyIssues
   // V linear.setContextIssue
   // X linear.getContextIssueDetails
   // V linear.addContextIssueComment
-  // X linear.changeContextIssueStatus
+  // V linear.changeContextIssueStatus
   // X linear.getIssueDetails
   // X linear.getProjects
   // X linear.setContextProject
