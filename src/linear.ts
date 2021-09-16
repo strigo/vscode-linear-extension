@@ -51,11 +51,9 @@ export const getIssueByIdentifier = async (
 ): Promise<Issue | null> => {
   if (_client) {
     try {
-      const issue = await _client.issueSearch(
-        JSON.stringify({ query: { issue: { identifier } } })
-      );
+      const issue = await _client.issue(identifier);
 
-      return issue.nodes[0] || null;
+      return issue || null;
     } catch (err) {
       console.error("Error getting issue by identifier", err);
     }

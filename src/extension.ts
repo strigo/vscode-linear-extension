@@ -103,23 +103,43 @@ export async function activate(context: vscode.ExtensionContext) {
 
   const setContextIssueDisposable = vscode.commands.registerCommand(
     "linear.setContextIssue",
-    async () => {
-      const issueIdentifier = (
-        await vscode.window.showInputBox({ placeHolder: "Issue identifier" })
-      )?.toString();
+    () => {
+      vscode.window.withProgress(
+        {
+          location: vscode.ProgressLocation.Notification,
+          cancellable: false,
+        },
+        async (progress, token) => {
+          token.onCancellationRequested(() => {
+            console.log("User canceled the long running operation");
+          });
 
-      if (!issueIdentifier) {
-        return;
-      }
+          const identifier = (
+            await vscode.window.showInputBox({
+              placeHolder: "Issue identifier",
+            })
+          )?.toString();
 
-      const selectedIssue = await getIssueByIdentifier(issueIdentifier);
+          if (!identifier) {
+            return;
+          }
 
-      if (selectedIssue) {
-        setContextIssueId(selectedIssue.id);
-        vscode.window.showInformationMessage(
-          `Linear context issue is set to ${selectedIssue.identifier}`
-        );
-      }
+          progress.report({ increment: 0, message: "Fetching issues..." });
+          const selectedIssue = await getIssueByIdentifier(identifier);
+          progress.report({ increment: 100 });
+
+          if (selectedIssue) {
+            setContextIssueId(selectedIssue.id);
+            vscode.window.showInformationMessage(
+              `Linear context issue is set to ${selectedIssue.identifier}`
+            );
+          } else {
+            vscode.window.showErrorMessage(
+              `Linear issue ${identifier} was not found`
+            );
+          }
+        }
+      );
     }
   );
   context.subscriptions.push(setContextIssueDisposable);
@@ -127,7 +147,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // Roadmap:
   // V linear.connect
   // V linear.getMyIssues
-  // / linear.setContextIssue
+  // V linear.setContextIssue
   // X linear.getContextIssueDetails
   // V linear.addContextIssueComment
   // X linear.changeContextIssueStatus
