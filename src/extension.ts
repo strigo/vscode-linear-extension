@@ -6,6 +6,7 @@ import {
   getMyIssues,
   setContextIssueId,
   addContextIssueComment,
+  getIssueByIdentifier,
 } from "./linear";
 
 // This method is called when the extension is activated.
@@ -25,7 +26,9 @@ export async function activate(context: vscode.ExtensionContext) {
   const connectDisposable = vscode.commands.registerCommand(
     "linear.connect",
     async () => {
-      const apiKey = (await vscode.window.showInputBox())?.toString();
+      const apiKey = (
+        await vscode.window.showInputBox({ placeHolder: "API key" })
+      )?.toString();
 
       if (apiKey) {
         await storeApiKey(apiKey);
@@ -81,7 +84,9 @@ export async function activate(context: vscode.ExtensionContext) {
   const addContextIssueCommentDisposable = vscode.commands.registerCommand(
     "linear.addContextIssueComment",
     async () => {
-      const comment = (await vscode.window.showInputBox())?.toString();
+      const comment = (
+        await vscode.window.showInputBox({ placeHolder: "Comment" })
+      )?.toString();
 
       if (comment) {
         if (await addContextIssueComment(comment)) {
@@ -95,6 +100,42 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
   context.subscriptions.push(addContextIssueCommentDisposable);
+
+  const setContextIssueDisposable = vscode.commands.registerCommand(
+    "linear.setContextIssue",
+    async () => {
+      const issueIdentifier = (
+        await vscode.window.showInputBox({ placeHolder: "Issue identifier" })
+      )?.toString();
+
+      console.log(issueIdentifier);
+
+      if (!issueIdentifier) {
+        return;
+      }
+
+      const selectedIssue = await getIssueByIdentifier(issueIdentifier);
+
+      if (selectedIssue) {
+        setContextIssueId(selectedIssue.id);
+        vscode.window.showInformationMessage(
+          `Linear context issue is set to ${selectedIssue.identifier}`
+        );
+      }
+    }
+  );
+  context.subscriptions.push(setContextIssueDisposable);
+
+  // Roadmap:
+  // V linear.connect
+  // V linear.getMyIssues
+  // / linear.setContextIssue
+  // X linear.getContextIssueDetails
+  // V linear.addContextIssueComment
+  // X linear.changeContextIssueStatus
+  // X linear.getIssueDetails
+  // X linear.getProjects
+  // X linear.setContextProject
 }
 
 // This method is called when your extension is deactivated
