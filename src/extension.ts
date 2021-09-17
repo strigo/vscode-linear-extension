@@ -8,7 +8,11 @@ import {
   addContextIssueComment,
   getIssueByIdentifier,
   getWorkflowStates,
-  setContextIssueStatus
+  setContextIssueStatus,
+  createIssue,
+  getMyTeams,
+  getTeamMembers,
+  getAvailablePriorities
 } from "./linear";
 
 // This method is called when the extension is activated.
@@ -153,12 +157,9 @@ export async function activate(context: vscode.ExtensionContext) {
       vscode.window.showInformationMessage("Getting available statuses...");
       const statuses = await getWorkflowStates();
 
-      console.error({ statuses });
-
       const selectedStatus = await vscode.window.showQuickPick(
         statuses?.map((status) => ({
           label: status.name,
-          // description: issue.identifier,
           target: status.id,
         })) || [],
         {
@@ -174,6 +175,112 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
   context.subscriptions.push(setContextIssueStatusDisposable);
+
+  const createIssueDisposable = vscode.commands.registerCommand(
+    "linear.createIssue",
+    async () => {
+      const title = (
+        await vscode.window.showInputBox({ placeHolder: "Please provide a title for the issue" })
+      )?.toString();
+
+      let selectedTeam;
+
+      const myTeams = await getMyTeams();
+      if (myTeams && myTeams.length > 1) {
+        selectedTeam = await vscode.window.showQuickPick(
+          myTeams?.map((team) => ({
+            label: team.name,
+            target: team.id,
+            linearTeam: team
+          })) || [],
+          {
+            placeHolder: "Select a team to set for the issue",
+          }
+        );
+      } else if (myTeams && myTeams.length === 1) {
+        const team = myTeams?.[0];
+        selectedTeam = { label: team.name, target: team.id, linearTeam: team };
+        vscode.window.showInformationMessage(
+          `Creating issue in team ${selectedTeam.label}.`
+        );
+      }
+
+      // They're mandatory
+      if (title && selectedTeam) {
+        const description = (
+          await vscode.window.showInputBox({ placeHolder: "Please provide a description" })
+        )?.toString();
+
+        const availableStatuses = await getWorkflowStates();
+        const selectedStatus = await vscode.window.showQuickPick(
+          availableStatuses?.map((status) => ({
+            label: status.name,
+            target: status.id,
+          })) || [],
+          {
+            placeHolder: "Select a status to set for the issue",
+          }
+        );
+
+        const availableAssignees = await getTeamMembers(selectedTeam.linearTeam);
+        const selectedAssignee = await vscode.window.showQuickPick(
+          availableAssignees?.map((assignee) => ({
+            label: assignee.name,
+            target: assignee.id,
+          })) || [],
+          {
+            placeHolder: "Select an assignee to set for the issue",
+          }
+        );
+
+        let estimateString = (
+          await vscode.window.showInputBox({ placeHolder: "Please provide an estimate" })
+        );
+        let estimate = estimateString ? parseInt(estimateString, 10) : undefined;
+
+
+        const availablePriorities = await getAvailablePriorities();
+        const selectedPriority = await vscode.window.showQuickPick(
+          availablePriorities?.map((priority) => ({
+            label: priority.label,
+            target: priority.priority,
+          })) || [],
+          {
+            placeHolder: "Select a priority to set for the issue",
+          }
+        );
+
+        const issuePayload = await createIssue(title, selectedTeam.target, description, selectedAssignee?.target, selectedStatus?.target, estimate, selectedPriority?.target);
+
+        if (issuePayload?.success) {
+          const issue = await issuePayload.issue;
+          if (issue) {
+            const action = await vscode.window.showInformationMessage(`Issue ${issue.identifier} created!`, 'Set active', 'Open in browser', 'Copy branch name');
+            if (action) {
+
+              switch (action) {
+                case 'Open in browser':
+                  vscode.env.openExternal(vscode.Uri.parse(issue.url));
+                case 'Set active':
+                  setContextIssueStatus(issue.identifier);
+                  vscode.window.showInformationMessage(
+                    `Set ${issue.identifier} as active!`
+                  );
+                case 'Copy branch name':
+                  await vscode.env.clipboard.writeText(issue.branchName);
+                  vscode.window.showInformationMessage(
+                    `Copied branch name ${issue.branchName} to clipboard!`
+                  );
+              }
+            }
+          }
+        }
+      } else {
+        vscode.window.showErrorMessage("Title cannot be empty");
+      }
+    }
+  );
+  context.subscriptions.push(createIssueDisposable);
 
   // Roadmap:
   // V linear.connect

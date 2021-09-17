@@ -1,5 +1,5 @@
 import { ExtensionContext, SecretStorage, Memento } from "vscode";
-import { Issue, LinearClient, WorkflowState } from "@linear/sdk";
+import { Issue, IssuePayload, IssuePriorityValue, LinearClient, Team, User, WorkflowState } from "@linear/sdk";
 
 let _secretStorage: SecretStorage;
 let _storage: Memento;
@@ -39,6 +39,22 @@ export const getMyIssues = async (): Promise<Issue[] | null> => {
       return myIssues.nodes;
     } catch (err) {
       console.error("Error getting my issues", err);
+    }
+  } else {
+    console.error("No initialized Linear client found");
+  }
+  return null;
+};
+
+export const getMyTeams = async (): Promise<Team[] | null> => {
+  if (_client) {
+    try {
+      const me = await _client.viewer;
+      const myTeams = await me.teams();
+
+      return myTeams.nodes;
+    } catch (err) {
+      console.error("Error getting my teams", err);
     }
   } else {
     console.error("No initialized Linear client found");
@@ -145,4 +161,59 @@ export const setContextIssueStatus = async (
     return false;
   }
   return true;
+};
+
+export const getAvailablePriorities = async (): Promise<IssuePriorityValue[] | null> => {
+  if (_client) {
+    try {
+      const availablePriorities = await _client.issuePriorityValues;
+
+      return availablePriorities;
+    } catch (err) {
+      console.error("Error getting priorities", err);
+    }
+  } else {
+    console.error("No initialized Linear client found");
+  }
+  return null;
+};
+
+export const getTeamMembers = async (team: Team): Promise<User[] | null> => {
+  if (_client) {
+    try {
+      const teamMembers = await team.members();
+
+      return teamMembers.nodes;
+    } catch (err) {
+      console.error("Error getting team members", err);
+    }
+  } else {
+    console.error("No initialized Linear client found");
+  }
+  return null;
+};
+
+export const createIssue = async (
+  title: string,
+  teamId: string,
+  description: string | undefined,
+  assigneeId: string | undefined,
+  stateId: string | undefined,
+  estimate: number | undefined,
+  priority: number | undefined,
+): Promise<IssuePayload | undefined> => {
+  if (!_client) {
+    return;
+  }
+
+  try {
+    const issuePayload = await _client.issueCreate({ title, teamId, description, assigneeId, stateId, estimate, priority });
+    if (!issuePayload.success) {
+      return;
+    }
+    return issuePayload;
+  } catch (err) {
+    console.error("Error creating issue", err);
+    return;
+  }
 };
