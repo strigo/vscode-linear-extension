@@ -1,70 +1,47 @@
-# linear README
+# vscode-linear-extension
 
-This is the README for your extension "linear". After writing up a brief description, we recommend including the following sections.
+This (unofficial!) VSCode - Linear extension aims to make it easier to work with Linear as part of the development workflow.
 
-## Features
+**Note: This is currently WIP! There are most certainly many bugs and more functionality to implement. Nny contributions will be appreciated.**
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+## Notable Features
 
-For example if there is an image subfolder under your extension project workspace:
+We don't intend on fully supporting all Linear actions. Linear is a great tool in itself, and many actions should be performed directly within its interface.
 
-\!\[feature X\]\(images/feature-x.png\)
+However, some actions are more easily performed while in the development context. The idea here is to fit in well with the user's workflow.
+For example, when someone's working on a specific issue, they may want to add comments as they stumble into things within the code.
+Or maybe they'd like to change the status of the current issue and select another issue to work on.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+* Connecting to linear account via user-specific API key.
+* Setting an issue to the vscode context manually, or by choosing from the user's assigned issues.
+* Creating issues.
+* Commenting on the current issue.
+* Changing the status of the current issue.
+* Showing a set of actions for the current issue.
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+Um... [vscode](https://code.visualstudio.com/) and a [Linear](https://linear.app/) account.
 
-## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+## Getting Started
 
-For example:
+1. Generate your own API key @ https://linear.app/ORG_NAME/settings/api
+1. Search for Linear in your Extensions Tab
+1. Click on the blue Install button
+1. Reload or restart your VSCode
+1. Run the VSCode command: "Linear: Connect", enter the Linear API key and press enter.
 
-This extension contributes the following settings:
+That's it! You can now browser through the different "Linear: ..." commands.
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+## Usage
 
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
+TBD!
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+See [Changelog](https://github.com/strigo/vscode-linear-extension/blob/master/CHANGELOG.md) for more info.
 
-### 1.0.0
+## Contributions
 
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+All contribution are welcome :)
