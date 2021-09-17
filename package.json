@@ -3,7 +3,7 @@
   "displayName": "Linear",
   "description": "Unofficial extension for managing your Linear projects from VS Code",
   "icon": "images/logo.png",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "strigo",
   "repository": "https://github.com/strigo/vscode-linear-extension",
   "engines": {
