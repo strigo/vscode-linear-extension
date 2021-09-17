@@ -12,7 +12,8 @@ import {
   createIssue,
   getMyTeams,
   getTeamMembers,
-  getAvailablePriorities
+  getAvailablePriorities,
+  getContextIssue
 } from "./linear";
 
 // This method is called when the extension is activated.
@@ -70,6 +71,7 @@ export async function activate(context: vscode.ExtensionContext) {
               label: `${issue.identifier} ${issue.title}`,
               description: issue.identifier,
               target: issue.id,
+              issue,
             })) || [],
             {
               placeHolder: "Select an issue to save to the working context",
@@ -80,6 +82,27 @@ export async function activate(context: vscode.ExtensionContext) {
             vscode.window.showInformationMessage(
               `Linear context issue is set to ${selectedIssue.description}`
             );
+
+            const { issue } = selectedIssue;
+            if (issue) {
+              const action = await vscode.window.showInformationMessage(`Actions for ${issue.identifier}!`, 'Copy ID', 'Open in browser', 'Copy branch name');
+              if (action) {
+                switch (action) {
+                  case 'Open in browser':
+                    vscode.env.openExternal(vscode.Uri.parse(issue.url));
+                  case 'Copy branch name':
+                    await vscode.env.clipboard.writeText(issue.branchName);
+                    vscode.window.showInformationMessage(
+                      `Copied branch name ${issue.branchName} to clipboard!`
+                    );
+                  case 'Copy ID':
+                    await vscode.env.clipboard.writeText(issue.identifier);
+                    vscode.window.showInformationMessage(
+                      `Copied ID ${issue.identifier} to clipboard!`
+                    );
+                }
+              }
+            }
           }
         }
       );
@@ -130,7 +153,7 @@ export async function activate(context: vscode.ExtensionContext) {
             return;
           }
 
-          progress.report({ increment: 0, message: "Fetching issues..." });
+          progress.report({ increment: 0, message: `Fetching issue ${identifier}...` });
           const selectedIssue = await getIssueByIdentifier(identifier);
           progress.report({ increment: 100 });
 
@@ -255,7 +278,9 @@ export async function activate(context: vscode.ExtensionContext) {
         if (issuePayload?.success) {
           const issue = await issuePayload.issue;
           if (issue) {
-            const action = await vscode.window.showInformationMessage(`Issue ${issue.identifier} created!`, 'Set active', 'Open in browser', 'Copy branch name');
+            const action = await vscode.window.showInformationMessage(
+              `Issue ${issue.identifier} created!`, 'Copy ID', 'Set active', 'Open in browser', 'Copy branch name'
+            );
             if (action) {
 
               switch (action) {
@@ -271,6 +296,11 @@ export async function activate(context: vscode.ExtensionContext) {
                   vscode.window.showInformationMessage(
                     `Copied branch name ${issue.branchName} to clipboard!`
                   );
+                case 'Copy ID':
+                  await vscode.env.clipboard.writeText(issue.identifier);
+                  vscode.window.showInformationMessage(
+                    `Copied ID ${issue.identifier} to clipboard!`
+                  );
               }
             }
           }
@@ -281,6 +311,35 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
   context.subscriptions.push(createIssueDisposable);
+
+  const showContextIssueActionsDisposable = vscode.commands.registerCommand(
+    "linear.showContextIssueActions",
+    async () => {
+
+      const issue = await getContextIssue();
+      if (issue) {
+        const action = await vscode.window.showInformationMessage(`Actions for ${issue.identifier}!`, 'Copy ID', 'Open in browser', 'Copy branch name');
+        if (action) {
+          switch (action) {
+            case 'Open in browser':
+              vscode.env.openExternal(vscode.Uri.parse(issue.url));
+            case 'Copy branch name':
+              await vscode.env.clipboard.writeText(issue.branchName);
+              vscode.window.showInformationMessage(
+                `Copied branch name ${issue.branchName} to clipboard!`
+              );
+            case 'Copy ID':
+              await vscode.env.clipboard.writeText(issue.identifier);
+              vscode.window.showInformationMessage(
+                `Copied ID ${issue.identifier} to clipboard!`
+              );
+          }
+        }
+      }
+    }
+  );
+  context.subscriptions.push(showContextIssueActionsDisposable);
+
 
   // Roadmap:
   // V linear.connect

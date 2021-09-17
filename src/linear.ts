@@ -217,3 +217,21 @@ export const createIssue = async (
     return;
   }
 };
+
+export const getContextIssue = async (): Promise<Issue | undefined> => {
+  if (!_client) {
+    return;
+  }
+  try {
+    const issueId = (await _storage.get("linearContextIssueId")) as string;
+    if (!issueId) {
+      return;
+    }
+    const issue = await _client.issue(issueId);
+    return issue;
+  } catch (err) {
+    console.error("Error retrieving context issue", err);
+    return;
+  }
+  return;
+};

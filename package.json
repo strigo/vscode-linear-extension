@@ -15,7 +15,8 @@
     "onCommand:linear.addContextIssueComment",
     "onCommand:linear.setContextIssue",
     "onCommand:linear.setContextIssueStatus",
-    "onCommand:linear.createIssue"
+    "onCommand:linear.createIssue",
+    "onCommand:linear.showContextIssueActions"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -43,6 +44,10 @@
       {
         "command": "linear.createIssue",
         "title": "Linear: Create issue"
+      },
+      {
+        "command": "linear.showContextIssueActions",
+        "title": "Linear: Show context issue actions"
       }
     ]
   },
