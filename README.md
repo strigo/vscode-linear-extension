@@ -2,7 +2,7 @@
 
 This (unofficial!) VSCode - Linear extension aims to make it easier to work with Linear as part of the development workflow.
 
-**Note: This is currently WIP! There are most certainly many bugs and more functionality to implement. Nny contributions will be appreciated.**
+**Note: This is currently WIP! There are most certainly many bugs and more functionality to implement. Any contributions will be appreciated.**
 
 ## Notable Features
 
