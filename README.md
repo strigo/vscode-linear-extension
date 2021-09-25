@@ -13,7 +13,7 @@ For example, when someone's working on a specific issue, they may want to add co
 Or maybe they'd like to change the status of the current issue and select another issue to work on.
 
 * Connecting to linear account via user-specific API key.
-* Setting an issue to the vscode context manually, or by choosing from the user's assigned issues.
+* Setting an issue to the VSCode context manually, or by choosing from the user's assigned issues.
 * Creating issues.
 * Commenting on the current issue.
 * Changing the status of the current issue.
@@ -21,22 +21,24 @@ Or maybe they'd like to change the status of the current issue and select anothe
 
 ## Requirements
 
-Um... [vscode](https://code.visualstudio.com/) and a [Linear](https://linear.app/) account.
+Um... [VSCode](https://code.visualstudio.com/) and a [Linear](https://linear.app/) account.
 
 
 ## Getting Started
 
-1. Generate your own API key @ https://linear.app/ORG_NAME/settings/api
+1. Generate your own API key @ https://linear.app/YOUR_ORG_NAME/settings/api
 1. Search for Linear in your Extensions Tab
-1. Click on the blue Install button
+1. Click on the "Install" button
 1. Reload or restart your VSCode
 1. Run the VSCode command: "Linear: Connect", enter the Linear API key and press enter.
 
-That's it! You can now browser through the different "Linear: ..." commands.
+That's it! You can now browse through the different "Linear: ..." commands.
 
 ## Usage
 
-TBD!
+1. Launch VS Code.
+1. Open the Command Palette (Linux/Windows: `Ctrl+Shift+P`, Mac: `Cmd+Shift+P`).
+1. Type 'Linear' to discover all available commands.
 
 ## Release Notes
 
