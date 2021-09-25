@@ -32,8 +32,6 @@ Um... [VSCode](https://code.visualstudio.com/) and a [Linear](https://linear.app
 1. Reload or restart your VSCode
 1. Open the Command Palette (Linux/Windows: `Ctrl+Shift+P`, Mac: `Cmd+Shift+P`).
 1. Run the VSCode command: "Linear: Connect", enter the Linear API key and press enter.
-1. Or type 'Linear:' to discover all available commands.
-
 
 That's it! You can now browse through the different "Linear: ..." commands.
 
