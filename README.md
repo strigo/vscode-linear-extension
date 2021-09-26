@@ -38,6 +38,19 @@ That's it! You can now browser through the different "Linear: ..." commands.
 
 TBD!
 
+## Roadmap
+- ✔️ `linear.connect`
+- ✔️ `linear.getMyIssues`
+- ✔️ `linear.setContextIssue`
+- ❌ `linear.getContextIssueDetails`
+- ✔️ `linear.addContextIssueComment`
+- ✔️ `linear.setContextIssueStatus`
+- ✔️ `linear.createIssue`
+- ✔️ `linear.showContextIssueActions`
+- ❌ `linear.getIssueDetails`
+- ❌ `linear.getProjects`
+- ❌ `linear.setContextProject`
+
 ## Release Notes
 
 See [Changelog](https://github.com/strigo/vscode-linear-extension/blob/master/CHANGELOG.md) for more info.

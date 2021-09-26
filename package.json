@@ -33,12 +33,12 @@
         "title": "Linear: Get all my issues"
       },
       {
-        "command": "linear.addContextIssueComment",
-        "title": "Linear: Comment context issue"
-      },
-      {
         "command": "linear.setContextIssue",
         "title": "Linear: Set context issue"
+      },
+      {
+        "command": "linear.addContextIssueComment",
+        "title": "Linear: Comment context issue"
       },
       {
         "command": "linear.setContextIssueStatus",
