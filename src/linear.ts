@@ -1,5 +1,13 @@
 import { ExtensionContext, SecretStorage, Memento } from "vscode";
-import { Issue, IssuePayload, IssuePriorityValue, LinearClient, Team, User, WorkflowState } from "@linear/sdk";
+import {
+  Issue,
+  IssuePayload,
+  IssuePriorityValue,
+  LinearClient,
+  Team,
+  User,
+  WorkflowState,
+} from "@linear/sdk";
 
 let _secretStorage: SecretStorage;
 let _storage: Memento;
@@ -149,10 +157,9 @@ export const setContextIssueStatus = async (
     if (!issueId) {
       return false;
     }
-    const statusPayload = await _client.issueUpdate(
-      issueId,
-      { stateId: status },
-    );
+    const statusPayload = await _client.issueUpdate(issueId, {
+      stateId: status,
+    });
     if (!statusPayload.success) {
       return false;
     }
@@ -163,7 +170,9 @@ export const setContextIssueStatus = async (
   return true;
 };
 
-export const getAvailablePriorities = async (): Promise<IssuePriorityValue[] | null> => {
+export const getAvailablePriorities = async (): Promise<
+  IssuePriorityValue[] | null
+> => {
   if (_client) {
     try {
       const availablePriorities = await _client.issuePriorityValues;
@@ -200,22 +209,30 @@ export const createIssue = async (
   assigneeId: string | undefined,
   stateId: string | undefined,
   estimate: number | undefined,
-  priority: number | undefined,
+  priority: number | undefined
 ): Promise<IssuePayload | undefined> => {
   if (!_client) {
     return;
   }
 
   try {
-    const issuePayload = await _client.issueCreate({ title, teamId, description, assigneeId, stateId, estimate, priority });
+    const issuePayload = await _client.issueCreate({
+      title,
+      teamId,
+      description,
+      assigneeId,
+      stateId,
+      estimate,
+      priority,
+    });
     if (!issuePayload.success) {
       return;
     }
     return issuePayload;
   } catch (err) {
     console.error("Error creating issue", err);
-    return;
   }
+  return;
 };
 
 export const getContextIssue = async (): Promise<Issue | undefined> => {
@@ -231,7 +248,6 @@ export const getContextIssue = async (): Promise<Issue | undefined> => {
     return issue;
   } catch (err) {
     console.error("Error retrieving context issue", err);
-    return;
   }
   return;
 };
