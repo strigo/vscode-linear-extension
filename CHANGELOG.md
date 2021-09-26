@@ -6,6 +6,19 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix typos in the documentation.
+- Reorder issue action buttons.
+
+### Added
+
+- Add .prettierrc configuration.
+
+## [0.0.1-0.0.3] - 2021-09-17
+
+### Added
+
 - Initial release
 - Support setting a user-specific Linear API key.
 - Support setting a Linear issue in the vscode context.
