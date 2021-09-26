@@ -13,7 +13,7 @@ import {
   getMyTeams,
   getTeamMembers,
   getAvailablePriorities,
-  getContextIssue
+  getContextIssue,
 } from "./linear";
 
 // This method is called when the extension is activated.
@@ -85,21 +85,29 @@ export async function activate(context: vscode.ExtensionContext) {
 
             const { issue } = selectedIssue;
             if (issue) {
-              const action = await vscode.window.showInformationMessage(`Actions for ${issue.identifier}!`, 'Copy ID', 'Open in browser', 'Copy branch name');
+              const action = await vscode.window.showInformationMessage(
+                `Actions for issue ${issue.identifier}`,
+                "Copy ID",
+                "Copy branch name",
+                "Open in browser"
+              );
               if (action) {
                 switch (action) {
-                  case 'Open in browser':
-                    vscode.env.openExternal(vscode.Uri.parse(issue.url));
-                  case 'Copy branch name':
-                    await vscode.env.clipboard.writeText(issue.branchName);
-                    vscode.window.showInformationMessage(
-                      `Copied branch name ${issue.branchName} to clipboard!`
-                    );
-                  case 'Copy ID':
+                  case "Copy ID":
                     await vscode.env.clipboard.writeText(issue.identifier);
                     vscode.window.showInformationMessage(
                       `Copied ID ${issue.identifier} to clipboard!`
                     );
+                    break;
+                  case "Copy branch name":
+                    await vscode.env.clipboard.writeText(issue.branchName);
+                    vscode.window.showInformationMessage(
+                      `Copied branch name ${issue.branchName} to clipboard!`
+                    );
+                    break;
+                  case "Open in browser":
+                    vscode.env.openExternal(vscode.Uri.parse(issue.url));
+                    break;
                 }
               }
             }
@@ -153,7 +161,10 @@ export async function activate(context: vscode.ExtensionContext) {
             return;
           }
 
-          progress.report({ increment: 0, message: `Fetching issue ${identifier}...` });
+          progress.report({
+            increment: 0,
+            message: `Fetching issue ${identifier}...`,
+          });
           const selectedIssue = await getIssueByIdentifier(identifier);
           progress.report({ increment: 100 });
 
@@ -176,7 +187,6 @@ export async function activate(context: vscode.ExtensionContext) {
   const setContextIssueStatusDisposable = vscode.commands.registerCommand(
     "linear.setContextIssueStatus",
     async () => {
-
       vscode.window.showInformationMessage("Getting available statuses...");
       const statuses = await getWorkflowStates();
 
@@ -203,7 +213,9 @@ export async function activate(context: vscode.ExtensionContext) {
     "linear.createIssue",
     async () => {
       const title = (
-        await vscode.window.showInputBox({ placeHolder: "Please provide a title for the issue" })
+        await vscode.window.showInputBox({
+          placeHolder: "Please provide a title for the issue",
+        })
       )?.toString();
 
       let selectedTeam;
@@ -214,7 +226,7 @@ export async function activate(context: vscode.ExtensionContext) {
           myTeams?.map((team) => ({
             label: team.name,
             target: team.id,
-            linearTeam: team
+            linearTeam: team,
           })) || [],
           {
             placeHolder: "Select a team to set for the issue",
@@ -231,7 +243,9 @@ export async function activate(context: vscode.ExtensionContext) {
       // They're mandatory
       if (title && selectedTeam) {
         const description = (
-          await vscode.window.showInputBox({ placeHolder: "Please provide a description" })
+          await vscode.window.showInputBox({
+            placeHolder: "Please provide a description",
+          })
         )?.toString();
 
         const availableStatuses = await getWorkflowStates();
@@ -245,7 +259,9 @@ export async function activate(context: vscode.ExtensionContext) {
           }
         );
 
-        const availableAssignees = await getTeamMembers(selectedTeam.linearTeam);
+        const availableAssignees = await getTeamMembers(
+          selectedTeam.linearTeam
+        );
         const selectedAssignee = await vscode.window.showQuickPick(
           availableAssignees?.map((assignee) => ({
             label: assignee.name,
@@ -256,11 +272,12 @@ export async function activate(context: vscode.ExtensionContext) {
           }
         );
 
-        let estimateString = (
-          await vscode.window.showInputBox({ placeHolder: "Please provide an estimate" })
-        );
-        let estimate = estimateString ? parseInt(estimateString, 10) : undefined;
-
+        let estimateString = await vscode.window.showInputBox({
+          placeHolder: "Please provide an estimate",
+        });
+        let estimate = estimateString
+          ? parseInt(estimateString, 10)
+          : undefined;
 
         const availablePriorities = await getAvailablePriorities();
         const selectedPriority = await vscode.window.showQuickPick(
@@ -273,34 +290,49 @@ export async function activate(context: vscode.ExtensionContext) {
           }
         );
 
-        const issuePayload = await createIssue(title, selectedTeam.target, description, selectedAssignee?.target, selectedStatus?.target, estimate, selectedPriority?.target);
+        const issuePayload = await createIssue(
+          title,
+          selectedTeam.target,
+          description,
+          selectedAssignee?.target,
+          selectedStatus?.target,
+          estimate,
+          selectedPriority?.target
+        );
 
         if (issuePayload?.success) {
           const issue = await issuePayload.issue;
           if (issue) {
             const action = await vscode.window.showInformationMessage(
-              `Issue ${issue.identifier} created!`, 'Copy ID', 'Set active', 'Open in browser', 'Copy branch name'
+              `Issue ${issue.identifier} created`,
+              "Set active",
+              "Copy ID",
+              "Copy branch name",
+              "Open in browser"
             );
             if (action) {
-
               switch (action) {
-                case 'Open in browser':
-                  vscode.env.openExternal(vscode.Uri.parse(issue.url));
-                case 'Set active':
+                case "Set active":
                   setContextIssueStatus(issue.identifier);
                   vscode.window.showInformationMessage(
                     `Set ${issue.identifier} as active!`
                   );
-                case 'Copy branch name':
-                  await vscode.env.clipboard.writeText(issue.branchName);
-                  vscode.window.showInformationMessage(
-                    `Copied branch name ${issue.branchName} to clipboard!`
-                  );
-                case 'Copy ID':
+                  break;
+                case "Copy ID":
                   await vscode.env.clipboard.writeText(issue.identifier);
                   vscode.window.showInformationMessage(
                     `Copied ID ${issue.identifier} to clipboard!`
                   );
+                  break;
+                case "Copy branch name":
+                  await vscode.env.clipboard.writeText(issue.branchName);
+                  vscode.window.showInformationMessage(
+                    `Copied branch name ${issue.branchName} to clipboard!`
+                  );
+                  break;
+                case "Open in browser":
+                  vscode.env.openExternal(vscode.Uri.parse(issue.url));
+                  break;
               }
             }
           }
@@ -315,42 +347,37 @@ export async function activate(context: vscode.ExtensionContext) {
   const showContextIssueActionsDisposable = vscode.commands.registerCommand(
     "linear.showContextIssueActions",
     async () => {
-
       const issue = await getContextIssue();
       if (issue) {
-        const action = await vscode.window.showInformationMessage(`Actions for ${issue.identifier}!`, 'Copy ID', 'Open in browser', 'Copy branch name');
+        const action = await vscode.window.showInformationMessage(
+          `Actions for ${issue.identifier}`,
+          "Copy ID",
+          "Copy branch name",
+          "Open in browser"
+        );
         if (action) {
           switch (action) {
-            case 'Open in browser':
-              vscode.env.openExternal(vscode.Uri.parse(issue.url));
-            case 'Copy branch name':
-              await vscode.env.clipboard.writeText(issue.branchName);
-              vscode.window.showInformationMessage(
-                `Copied branch name ${issue.branchName} to clipboard!`
-              );
-            case 'Copy ID':
+            case "Copy ID":
               await vscode.env.clipboard.writeText(issue.identifier);
               vscode.window.showInformationMessage(
                 `Copied ID ${issue.identifier} to clipboard!`
               );
+              break;
+            case "Copy branch name":
+              await vscode.env.clipboard.writeText(issue.branchName);
+              vscode.window.showInformationMessage(
+                `Copied branch name ${issue.branchName} to clipboard!`
+              );
+              break;
+            case "Open in browser":
+              vscode.env.openExternal(vscode.Uri.parse(issue.url));
+              break;
           }
         }
       }
     }
   );
   context.subscriptions.push(showContextIssueActionsDisposable);
-
-
-  // Roadmap:
-  // V linear.connect
-  // V linear.getMyIssues
-  // V linear.setContextIssue
-  // X linear.getContextIssueDetails
-  // V linear.addContextIssueComment
-  // V linear.changeContextIssueStatus
-  // X linear.getIssueDetails
-  // X linear.getProjects
-  // X linear.setContextProject
 }
 
 // This method is called when your extension is deactivated
