@@ -58,4 +58,4 @@ See [Changelog](https://github.com/strigo/vscode-linear-extension/blob/master/CH
 
 ## Contributions
 
-All contribution are welcome :)
+All contributions are welcome :)
